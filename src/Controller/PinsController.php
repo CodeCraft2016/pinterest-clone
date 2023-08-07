@@ -2,17 +2,18 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\PinRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PinsController extends AbstractController
 {
-    #[Route('/pins', name: 'app_pins')]
-    public function index(): Response
+    #[Route('/', name: 'app_home')]
+    public function index(PinRepository $pinRepository): Response
     {
-        return $this->render('pins/index.html.twig', [
-            'controller_name' => 'PinsController',
-        ]);
+        $pins = $pinRepository->findAll();   
+
+        return $this->render('pins/index.html.twig',['pins'=>$pins]);
     }
 }
