@@ -6,10 +6,11 @@
 <h1>{{Pluralize(pins|length,'pin')}}</h1>
 
 {% for pin in pins %}
-
+    
 <article>
-<h2>{{pin.title}}</h2>
-<p>{{pin.description}}</p>
+<p>{{pin.id}}</p>
+<h2><a href="#">{{pin.title}}</a></h2>
+<p><a href="#">{{pin.description}}</a></p>
 </article>
     
 {% endfor %}
