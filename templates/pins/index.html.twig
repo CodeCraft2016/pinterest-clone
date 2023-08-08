@@ -8,8 +8,8 @@
 {% for pin in pins %}
     
 <article>
-<p>{{pin.id}}</p>
-<h2><a href="#">{{pin.title}}</a></h2>
+
+<h2><a href="{{path('app_pins_show', {id:pin.id})}}">{{pin.title}}</a></h2>
 <p><a href="#">{{pin.description}}</a></p>
 </article>
     
