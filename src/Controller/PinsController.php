@@ -56,6 +56,25 @@ class PinsController extends AbstractController
 
         return $this->render('pins/edit.html.twig',['pin'=>$pin,'form'=>$form->createView()]);
     }
+
+    //Delete Pins
+    #[Route('/pins/{id<[0-9]+>}/delete', name: 'app_pins_delete', methods : ['POST','DELETE'])]
+    public function delete(Request $request,Pin $pin): Response
+    {
+        
+        if($this->isCsrfTokenValid('pin.delete',$request->request->get('csrf_token')))
+        {
+            $this->em->remove($pin);
+            $this->em->flush();
+            return $this->redirectToRoute('app_home');
+
+        }else
+        {
+            dd('return  Expired page');
+        }
+            
+        //return $this->render('pins/edit.html.twig',['pin'=>$pin,'form'=>$form->createView()]);
+    }
     
     // Create Pins
     #[Route('/pins/create', name:'app_pins_create', methods : ['GET','POST'])]
