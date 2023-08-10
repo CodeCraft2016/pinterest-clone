@@ -73,7 +73,6 @@ class PinsController extends AbstractController
             dd('return  Expired page');
         }
             
-        //return $this->render('pins/edit.html.twig',['pin'=>$pin,'form'=>$form->createView()]);
     }
     
     // Create Pins
