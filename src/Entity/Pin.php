@@ -24,7 +24,7 @@ class Pin
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message:"Title Can't be blank")]
-    #[Assert\Length(3)]
+    #[Assert\Length(min:3)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
