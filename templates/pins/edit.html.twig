@@ -3,10 +3,16 @@
 {% block title 'Edit Pin' %}
 
 {% block body %}
-<h1>Update Pin #{{pin.id}}</h1>
 
 
-{{include('layouts/partials/_form.html.twig', {'submitButtonText' : 'Update Pin'})}}
+    <div class="row">
+        <div class="col-6 mx-auto">
+             <h1>Update Pin #{{pin.id}}</h1>
+            {{include('layouts/partials/_form.html.twig', {'submitButtonText' : 'Update Pin'})}}
+        </div>
+    </div>
+
+        
 
     
 
