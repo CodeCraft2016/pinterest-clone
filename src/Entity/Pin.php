@@ -10,6 +10,8 @@ use App\Repository\PinRepository;
 use App\Entity\Traits\Timestampable;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
+
 #[ORM\Entity(repositoryClass: PinRepository::class)]
 #[ORM\Table(name:"pins")]
 #[ORM\HasLifecycleCallbacks]
@@ -31,6 +33,11 @@ class Pin
     #[Assert\NotBlank]
     #[Assert\Length(min:10)]
     private ?string $description = null;
+
+
+    
+    #[ORM\Column(length: 255)]
+    private ?string $imageName = null;
 
     
 
@@ -59,6 +66,18 @@ class Pin
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageName(string $imageName): static
+    {
+        $this->imageName = $imageName;
 
         return $this;
     }

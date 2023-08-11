@@ -12,6 +12,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\File;
+
+
 
 class PinsController extends AbstractController
 {
@@ -44,6 +49,7 @@ class PinsController extends AbstractController
     #[Route('/pins/{id<[0-9]+>}/edit', name: 'app_pins_edit', methods : ['GET','POST','PUT'])]
     public function edit(Request $request,Pin $pin): Response
     {
+        
         $form = $this->createForm(PinType::class, $pin);
 
         $form->handleRequest($request);
@@ -55,7 +61,7 @@ class PinsController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        return $this->render('pins/edit.html.twig',['pin'=>$pin,'form'=>$form->createView()]);
+        return $this->render('pins/edit.html.twig',['pin'=>$pin,'form'=>$form->createView(),'existingImage' => $pin->getImageName()]);
     }
 
     //Delete Pins
@@ -79,7 +85,7 @@ class PinsController extends AbstractController
     
     // Create Pins
     #[Route('/pins/create', name:'app_pins_create', methods : ['GET','POST'])]
-    public function create(Request $request): Response
+    public function create(Request $request, SluggerInterface $slugger): Response
     {
        
         $pin = new Pin;
@@ -87,12 +93,37 @@ class PinsController extends AbstractController
 
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            $this->em->persist($pin);
-            $this->em->flush();
+                
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('imageName')->getData();
+            // this condition is needed because the 'imageName' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
 
-            $this->addFlash('success', 'Pin Successfully Created! ');
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('uploads'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
 
-            return $this->redirectToRoute('app_home');
+                // updates the 'imageFilename' property to store the PDF file name
+                // instead of its contents
+                $pin->setImageName($newFilename);
+                $this->em->persist($pin);
+                $this->em->flush();
+                $this->addFlash('success', 'Pin Successfully Created! ');
+
+                return $this->redirectToRoute('app_home');
+            }
+
 
 
 
