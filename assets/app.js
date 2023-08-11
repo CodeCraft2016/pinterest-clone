@@ -6,7 +6,14 @@
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
+import './styles/app.scss';
+
+
+// this loads jquery, but does *not* set a global $ or jQuery variable
+// Import jQuery
+import $ from 'jquery';
+
+
 
 // start the Stimulus application
 import './bootstrap';
