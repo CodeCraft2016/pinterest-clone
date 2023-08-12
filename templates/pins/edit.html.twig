@@ -8,6 +8,13 @@
     <div class="row">
         <div class="col-6 mx-auto">
              <h1>Update Pin #{{pin.id}}</h1>
+             {% if existingImage  %}
+             <div class="col-12">
+                <img src="{{ asset('uploads/'~ pin.imageName) }}" class="img-thumbnail" alt="Uploaded Image">
+             </div>
+             {% endif %}
+           
+
             {{include('layouts/partials/_form.html.twig', {'submitButtonText' : 'Update Pin'})}}
         </div>
     </div>

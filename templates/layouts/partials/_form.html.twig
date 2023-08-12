@@ -1,9 +1,7 @@
 {{form_start(form)}}
-{% if existingImage %}
-    <p>Existing Image: {{ existingImage }}</p>
-{% endif %}
 
-{{ form_row(form.imageName, {value: existingImage}) }}
+
+{{ form_row(form.imageName) }}
 
 {{form_widget(form)}}
 <input type="submit" value="{{submitButtonText|default('Submit')}}" class="btn btn-primary col-12" formnovalidate>
