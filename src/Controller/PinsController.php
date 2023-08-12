@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Pin;
 use App\Form\PinType;
+use App\Service\ImageManager;
 use App\Repository\PinRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -57,40 +58,14 @@ class PinsController extends AbstractController
         if($form->isSubmitted() && $form->isValid())
         {
             
-            $oldImagePath = $pin->getImageName();
             $imageFile = $form->get('imageName')->getData();
             
-            if ($imageFile) {
-                
-                if ($oldImagePath) {
-                    $projectDir = $this->getParameter('kernel.project_dir');
-                    $filesystem = new Filesystem();
-                    try{
+            if ($imageFile) { 
+                // Delete old image
+                $this->deleteImage($pin->getImageName());
 
-                        $filesystem->remove($projectDir.'/public/uploads/'.$oldImagePath); // Delete the old image file
-
-                    }catch(\Exception $e)
-                    {
-                        dd($e);
-                    }
-                   
-                }
-
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
-
-                // Move the file to the directory where brochures are stored
-                try {
-                    $imageFile->move(
-                        $this->getParameter('uploads'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                    dd($e);
-                }
+                // save image on public/uploads folder
+                $newFilename = $this->saveImage($imageFile,$slugger);
 
                 $pin->setImageName($newFilename);
 
@@ -110,20 +85,10 @@ class PinsController extends AbstractController
         
         if($this->isCsrfTokenValid('pin.delete',$request->request->get('csrf_token')))
         {
-            $oldImagePath = $pin->getImageName();
-                if ($oldImagePath) {
-                    $projectDir = $this->getParameter('kernel.project_dir');
-                    $filesystem = new Filesystem();
-                    try{
+            // Delete image from upload folder
+            $this->deleteImage($pin->getImageName());
 
-                        $filesystem->remove($projectDir.'/public/uploads/'.$oldImagePath); // Delete the old image file
-
-                    }catch(\Exception $e)
-                    {
-                        dd($e);
-                    }
-                   
-                }
+            // remove pin form database
             $this->em->remove($pin);
             $this->em->flush();
             $this->addFlash('info', 'Pin successfully deleted');
@@ -152,7 +117,51 @@ class PinsController extends AbstractController
             // this condition is needed because the 'imageName' field is not required
             // so the PDF file must be processed only when a file is uploaded
             if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                
+                //Save image on public/Uploads Folder
+                $newFilename = $this->saveImage($imageFile,$slugger);
+                $pin->setImageName($newFilename);
+               
+
+               
+            }
+            $this->em->persist($pin);
+            $this->em->flush();
+            $this->addFlash('success', 'Pin Successfully Created! ');
+            return $this->redirectToRoute('app_home');
+
+
+
+
+        }
+
+        return $this->render('pins/create.html.twig', ['form'=>$form->createView()]);
+    }
+
+
+    /**
+     * Private Function Helper
+     */
+
+     //Get Full image Path
+     private function getImagePath($path)
+     {
+        return $this->getParameter('kernel.project_dir').'/public/uploads/'.$path;
+
+     }
+     // Delete image from public/Uploads Folder
+     private function deleteImage($image): void
+     {
+        if ($image) {
+            $filesystem = new ImageManager();
+            $filesystem->removeImage($this->getImagePath($image));  
+        }
+     }
+
+     // Save Image on public/Uploads Folder
+     private function saveImage($imageFile,$slugger)
+     {
+        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
@@ -167,21 +176,8 @@ class PinsController extends AbstractController
                     // ... handle exception if something happens during file upload
                 }
 
-                // updates the 'imageFilename' property to store the PDF file name
-                // instead of its contents
-                $pin->setImageName($newFilename);
-                $this->em->persist($pin);
-                $this->em->flush();
-                $this->addFlash('success', 'Pin Successfully Created! ');
+        return $newFilename;
+     }
 
-                return $this->redirectToRoute('app_home');
-            }
-
-
-
-
-        }
-
-        return $this->render('pins/create.html.twig', ['form'=>$form->createView()]);
-    }
+     
 }

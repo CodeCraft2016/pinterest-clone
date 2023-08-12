@@ -14,10 +14,6 @@ trait Timestampable
     #[ORM\Column(options:["default"=>"CURRENT_TIMESTAMP"]) ]
     private ?\DateTimeImmutable $updatedAt = null;
 
-
-
-
-
 public function getCreatedAt(): ?\DateTimeImmutable
 {
     return $this->createdAt;
