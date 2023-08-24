@@ -3,16 +3,34 @@
 {% block title %}Pinterest!{% endblock %}
 
 {% block body %}
-<h1>{{Pluralize(pins|length,'pin')}}</h1>
+{% if pins|length > 0 %}
+  <h1>{{Pluralize(pins|length,'pin')}}</h1>
+    {% for row in pins|batch(3) %}
+    <div class="row mb-5">
+    {% for pin in row %}
+    <div class="mt-5 col-4">
+           <article class="pin bg-white rounded shadow">
+           <div class="mw-100 overflow-hidden">
+             <a href="{{path('app_pins_show', {id:pin.id})}}"> 
+               <img src="{{ pin.imageName ? asset('uploads/'~ pin.imageName) : asset('images/placeholder.jpeg')  }}" class="img-thumbnail rounded-top img-100" alt="{{pin.imageName ? pin.title : "placeholder"}}">
+            </a>
+           </div>
+          
+            
+             <h2 class="pl-3 pb-3 pt-3 h5"><a href="{{path('app_pins_show', {id:pin.id})}}" class="text-muted text-decoration-none text-secondary">{{pin.title}}</a></h2>
+             <p class="pl-3 pb-3 text-muted"><small>Submitted [OWNER FULL NAME]</small></p>
+             <p>Submitted :  {{pin.createdAt|ago}}</p>
+           </article>
+    </div>
 
-{% for pin in pins %}
-    
-<article>
+    {% endfor %}
+    </div>
+    {% endfor %}
+{% else %}
 
-<h2><a href="{{path('app_pins_show', {id:pin.id})}}">{{pin.title}}</a></h2>
-<p><a href="#">{{pin.description| u.truncate(10,'...', false)}}</a></p>
-<p>Submitted :  {{pin.createdAt|ago}}</p>
-</article>
-    
-{% endfor %}
+   <p class="h1 text-center mt-5">No pins yet. <a href={{path('app_pins_create')}}>Be the first!</a></p>
+
+{% endif %}
+
+
 {% endblock %}

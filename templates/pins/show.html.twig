@@ -3,9 +3,14 @@
 {% block title pin.title %}
 
 {% block body %}
-<article>
-<h1>{{pin.title}}</h1>
-</article>
+<div class="row">
+    <article class="col-6 mx-auto">
+        <h1>{{pin.title}}</h1>
+        <p>{{pin.description}}</p>
+           <img src="{{ pin.imageName ? asset('uploads/'~ pin.imageName) : asset('images/placeholder.jpeg')  }}" class="img-thumbnail img300" alt="{{pin.imageName ? pin.title : "placeholder"}}">
+    </article>
+</div>
+
 <a href="{{path('app_pins_edit', {id:pin.id})}}">Edit</a> |
 <a href="#" onClick="event.preventDefault(); confirm('Are you sure') && document.getElementById('js-pin-delete').submit();" >Delete</a> |
 

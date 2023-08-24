@@ -27,4 +27,28 @@ section{
 .alert-info{
 	background-color : blue;
 }
+
+.img300{
+
+	width: 300px;
+	height: 300px;
+}
+
+.img-100{
+	width: 100%;
+	height: 450px;
+}
+
+.pin img{
+	transition: transform 0.3s ease-out;
+ 	&:hover{
+		transform: scale(1.075);
+ 	}
+}
+
+/**Helpers**/
+
+.pl-3{
+	padding-left: 1rem;
+}
 			
