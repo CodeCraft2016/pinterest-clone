@@ -6,11 +6,11 @@
 
 
     <div class="row">
-        <div class="col-6 mx-auto">
+        <div class="col-4 mx-auto">
              <h1>Update Pin #{{pin.id}}</h1>
              {% if existingImage  %}
              <div class="col-12">
-                <img src="{{ asset('uploads/'~ pin.imageName) }}" class="img-thumbnail" alt="Uploaded Image">
+                <img src="{{ asset('uploads/'~ pin.imageName) }}" class="img-thumbnail img-100" alt="Uploaded Image">
              </div>
              {% endif %}
            

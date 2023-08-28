@@ -43,7 +43,7 @@ class PinsController extends AbstractController
     #[Route('/pins/{id<[0-9]+>}', name: 'app_pins_show', methods:'GET')]
     public function show(Pin $pin): Response
     {
-        
+
         return $this->render('pins/show.html.twig',compact('pin'));
     }
 
@@ -54,6 +54,8 @@ class PinsController extends AbstractController
         
         $form = $this->createForm(PinType::class, $pin);
         $form->handleRequest($request);
+
+    
         
         if($form->isSubmitted() && $form->isValid())
         {
@@ -122,9 +124,10 @@ class PinsController extends AbstractController
                 $newFilename = $this->saveImage($imageFile,$slugger);
                 $pin->setImageName($newFilename);
                
-
-               
             }
+            // Set current auth user
+            $pin->setUser($this->getUser());
+
             $this->em->persist($pin);
             $this->em->flush();
             $this->addFlash('success', 'Pin Successfully Created! ');
